@@ -114,7 +114,7 @@ export interface MockSwap extends BaseContract {
     balanceByUser(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber] & { eth: BigNumber; weth: BigNumber }>;
+    ): Promise<[BigNumber, BigNumber] & { usdc: BigNumber; weth: BigNumber }>;
 
     deposit(
       user: PromiseOrValue<string>,
@@ -143,7 +143,7 @@ export interface MockSwap extends BaseContract {
   balanceByUser(
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
-  ): Promise<[BigNumber, BigNumber] & { eth: BigNumber; weth: BigNumber }>;
+  ): Promise<[BigNumber, BigNumber] & { usdc: BigNumber; weth: BigNumber }>;
 
   deposit(
     user: PromiseOrValue<string>,
@@ -172,7 +172,7 @@ export interface MockSwap extends BaseContract {
     balanceByUser(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber] & { eth: BigNumber; weth: BigNumber }>;
+    ): Promise<[BigNumber, BigNumber] & { usdc: BigNumber; weth: BigNumber }>;
 
     deposit(
       user: PromiseOrValue<string>,

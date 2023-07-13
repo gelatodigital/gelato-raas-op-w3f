@@ -2,12 +2,13 @@
 pragma solidity ^0.8.0;
 
 struct Pair {
-    uint256 eth;
+    uint256 usdc;
     uint256 weth;
 }
 
 contract MockSwap {
-    string private greeting;
+    uint256 constant FACTOR = 10000; 
+
     mapping(address => Pair) public balanceByUser;
     mapping(address => address) public operatorByUser;
 
@@ -23,7 +24,7 @@ contract MockSwap {
             "MockSwap.swap not allowed"
         );
 
-        balanceByUser[user].eth = balanceByUser[user].eth + amount;
+        balanceByUser[user].usdc = balanceByUser[user].usdc + amount;
     }
 
     function swap(address user, uint256 price, bool buy) external {
@@ -34,15 +35,15 @@ contract MockSwap {
         Pair storage userPair = balanceByUser[user];
         require(
             (buy == true && userPair.weth == 0) ||
-                (buy == false && userPair.eth == 0),
+                (buy == false && userPair.usdc == 0),
             "MockSwap.swap wrong config trade"
         );
 
         if (buy) {
-            userPair.weth = userPair.eth / price;
-            userPair.eth = 0;
+            userPair.weth = (userPair.usdc * FACTOR) / price;
+            userPair.usdc = 0;
         } else {
-            userPair.eth = userPair.weth * price + userPair.eth;
+            userPair.usdc = (userPair.weth * price/FACTOR) + userPair.usdc;
             userPair.weth = 0;
         }
     }

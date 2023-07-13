@@ -11,9 +11,9 @@ import "@typechain/hardhat";
 import * as glob from 'glob';
 import { resolve } from 'path';
 
-glob.sync('./tasks/**/*.ts').forEach(function (file: any) {
-  require(resolve(file));
-});
+
+
+const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || "";
 
 // dynamically changes endpoints for local tests
 const zkSyncTestnet =
@@ -57,18 +57,22 @@ const config: HardhatUserConfig = {
   w3f: {
     rootDir: "./web3-functions",
     debug: false,
-    networks: ["hardhat", "mumbai"], //(multiChainProvider) injects provider for these networks
+    networks: ["hardhat", "zkSync","polygon"], //(multiChainProvider) injects provider for these networks
   },
-  defaultNetwork: "zkSync",
+  defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      zksync: false,
+      zksync: true,
     },
     zkSyncTestnet,
     zkSync,
+    polygon: {
+      chainId: 137,
+      url: "https://polygon-rpc.com",
+    },
   },
   etherscan: { // Optional - If you plan on verifying a smart contract on Ethereum within the same project
-    apiKey: "8YIR2SATQRH4HV2FQBHWJIV1HMFCNYQI8V" //<Your API key for Etherscan>,
+    apiKey:  ETHERSCAN_KEY //<Your API key for Etherscan>,
   },
   solidity: {
     version: "0.8.17",

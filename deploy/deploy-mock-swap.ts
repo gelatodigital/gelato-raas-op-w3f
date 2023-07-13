@@ -15,7 +15,7 @@ if (!PRIVATE_KEY)
 
 // An example of a deploy script that will deploy and call a simple contract.
 export default async function (hre: HardhatRuntimeEnvironment) {
-  console.log(`Running deploy script for the Greeter contract`);
+  console.log(`Running deploy script for the MockSwap contract`);
 
   // Initialize the wallet.
   const wallet = new Wallet(PRIVATE_KEY);
@@ -38,7 +38,6 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   // await depositHandle.wait();
 
   // Deploy this contract. The returned object will be of a `Contract` type, similarly to ones in `ethers`.
-  // `greeting` is an argument for contract constructor.
   const parsedFee = ethers.utils.formatEther(deploymentFee.toString());
   console.log(`The deployment is estimated to cost ${parsedFee} ETH`);
 

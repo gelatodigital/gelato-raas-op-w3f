@@ -2,9 +2,13 @@
 import {
   Web3Function,
   Web3FunctionContext,
+  Web3FunctionResult,
 } from "@gelatonetwork/web3-functions-sdk";
-
-import { Contract } from "ethers";
+import {
+  impersonateAccount,
+  setBalance,
+} from "@nomicfoundation/hardhat-network-helpers";
+import { Contract, ethers } from "ethers";
 import { uniswapQuote } from "./uniswap-quote";
 import { MockSwapAbi } from "./abi";
 import { MockSwap } from "../../typechain-types/MockSwap";
@@ -13,13 +17,15 @@ import { parseEther } from "ethers/lib/utils";
 Web3Function.onRun(async (context: Web3FunctionContext) => {
   const { userArgs, storage, secrets, multiChainProvider } = context;
 
-  const provider = multiChainProvider.default();
 
+  const provider = multiChainProvider.default();
 
   const POLYGON_PROVIDER = multiChainProvider.chainId(137)
 
   ///// User Args
   const user = userArgs.user as string;
+  const MOCK_SWAP_ADDRESS  = userArgs.contract as string;
+
 
   ///// User Storage
   const lastMin =  +((await storage.get("lastMin")) ?? "0");
@@ -29,7 +35,7 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
   const ENTRY = +((await secrets.get("ENTRY")) as string);
   const EXIT = +((await secrets.get("EXIT")) as string);
 
-  const MOCK_SWAP_ADDRESS = "0x46B886Cb31B613339Fda33aA340eC351c78244dc";
+ 
 
   const mockSwapContract = new Contract(
     MOCK_SWAP_ADDRESS,
@@ -37,17 +43,18 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
     provider
   ) as MockSwap;
 
-  let wethBalance = +(
-    await mockSwapContract.balanceByUser(user)
-  ).weth.toString();
-  console.log("WETH: " + wethBalance / 10 ** 18);
+
+  
+  let userBalance =  await mockSwapContract.balanceByUser(user);
+
+
+  let wethBalance = +userBalance.weth.toString();
+  let usdcbalance = +userBalance.usdc.toString();
+
 
   let price = await uniswapQuote(POLYGON_PROVIDER);
 
-    console.log(price);
-
-  let currentPosition = (+wethBalance.toString() / 10 ** 18) * price;
-  console.log(`Current Position: ${currentPosition}$`);
+  console.log(`Current Price: ${price}`);
 
   const activeTrade = wethBalance == 0 ? false : true;
   console.log(activeTrade ? "Active Trade" : "No trade");
@@ -55,6 +62,7 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
 
 
   if (activeTrade) {
+
     /////  ==== We are IN TRADE ===================== /////
     ///  *****************************************************  ///
     if (lastMax == 0) {
@@ -99,25 +107,15 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
       ///  Price Decrease Greater than threshold ---> EXIT THE TRADE
       ///  *****************************************************  ///
       await storage.set("lastMin", price.toString());
-      let priceToPublish = parseEther(price.toString())
+  
       console.log(
         `Trade Exit---> Price Decrease ${((diff / lastMax) * 100).toFixed(
           2
         )} greater than ${EXIT} %`
       );
 
-      const iface = mockSwapContract.interface;
-      let callData = iface.encodeFunctionData("swap", [user, priceToPublish, false]);
-
-      return {
-        canExec: true,
-        callData: [
-          {
-            to: mockSwapContract.address,
-            data: callData,
-          },
-        ],
-      };
+      const payload = await returnCalldata(price,mockSwapContract,user,false)
+      return  payload;
     }
   } else {
 
@@ -125,7 +123,11 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
     ///  *****************************************************  ///
     if (lastMin == 0) {
       await storage.set("lastMin", price.toString());
-      return { canExec: false, message: "Initiatig Price Entry" };
+      console.log("Initiatig Price Entry")
+
+      // do initial transacrion
+      const payload = await returnCalldata(price,mockSwapContract,user,true)
+      return  payload;
     }
 
     let diff = price - lastMin;
@@ -168,20 +170,30 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
 
       await storage.set("lastMax", price.toString());
 
-      let priceToPublish = parseEther(price.toString())
+      const payload = await returnCalldata(price,mockSwapContract,user,true)
 
-      const iface = mockSwapContract.interface;
-      let callData = iface.encodeFunctionData("swap", [user, priceToPublish, true]);
-
-      return {
-        canExec: true,
-        callData: [
-          {
-            to: mockSwapContract.address,
-            data: callData,
-          },
-        ],
-      };
+      return  payload;
     }
   }
 });
+
+
+
+const returnCalldata = async (price:number,mockSwapContract:Contract,user:string, buy:boolean):Promise<Web3FunctionResult> => {
+ 
+  let priceToPublish = +(price * 10000).toFixed(0);
+  console.log(priceToPublish)
+  const iface = mockSwapContract.interface;
+  let callData = iface.encodeFunctionData("swap", [user, priceToPublish,buy]);
+  return {
+    canExec: true,
+    callData: [
+      {
+        to: mockSwapContract.address,
+        data: callData,
+      },
+    ],
+  };
+  
+
+}

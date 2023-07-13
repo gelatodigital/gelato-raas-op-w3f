@@ -30,12 +30,12 @@ b) "Bounce Entry."
 
 ## Demo
 
-We have created a MockSwap contract that do the "fake" swapping between usdc and weth, the contract is deployed on zkSync Mainnet at [https://explorer.zksync.io/address/0x46B886Cb31B613339Fda33aA340eC351c78244dc#transactions](https://explorer.zksync.io/address/0x46B886Cb31B613339Fda33aA340eC351c78244dc#transactions)
+We have created a MockSwap contract that do the "fake" swapping between usdc and weth, the contract is deployed on zkSync Mainnet at [https://explorer.zksync.io/address/0x5e78ba86fd2E56d94c13334cD17FBD9Bb16838e0#transactions](https://explorer.zksync.io/address/0x5e78ba86fd2E56d94c13334cD17FBD9Bb16838e0#transactions)
 
 
 
 
-The task is live on zkSync [here](https://beta.app.gelato.network/task/0xba472dc90b0b31ffbcbed84e3937fd26cefcb7e033c568c24f449189866d60b1?chainId=324)
+The task is live on zkSync [here](https://beta.app.gelato.network/task/0xa506fc8b0bd6dfae281637c37eed7956a083b0f3fcebf462297e051c8d87d4be?chainId=324)
 
 
 ### Steps to step the web3 function

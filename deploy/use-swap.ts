@@ -17,7 +17,7 @@ if (!PRIVATE_KEY)
   throw "⛔️ Private key not detected! Add it to the .env file!";
 
 // Address of the contract on zksync testnet
-const CONTRACT_ADDRESS = "0x46B886Cb31B613339Fda33aA340eC351c78244dc";
+const CONTRACT_ADDRESS = "0x5e78ba86fd2E56d94c13334cD17FBD9Bb16838e0";
 
 if (!CONTRACT_ADDRESS) throw "⛔️ Contract address not provided";
 
@@ -38,14 +38,17 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   ) as MockSwap; 
 
   // Read message from contract
-
+  const newMessage =  parseEther("1")
+  const tx = await contract.deposit("0xB65540bBA534E88EB4a5062D0E6519C07063b259",newMessage)
+  await tx.wait();
 
   // send transaction to update the message
-  const newMessage =  parseEther("1")
-  const tx = await contract.setOperator("0x33cf616a7405b4464653f9d543052a1b416c35b1")
+  const price=  parseEther("1.002")
+  const tx2 = await contract.swap("0xB65540bBA534E88EB4a5062D0E6519C07063b259",price,true)
+  await tx2.wait();
+  
 
-  console.log(`Transaction to change the message is ${tx.hash}`);
-  await tx.wait();
+  
 
   // Read message after transaction
  

@@ -31,10 +31,14 @@
     "zksync-web3": "^0.14.3"
   },
   "scripts": {
-    "test": "NODE_ENV=test hardhat test --network zkSyncTestnet",
+    "test": "NODE_ENV=test hardhat test --network zkSync",
     "deploy": "yarn hardhat deploy-zksync --script deploy-mock-swap.ts",
-    "greet": "yarn hardhat deploy-zksync --script use-greeter.ts",
+    "initialize": "yarn hardhat deploy-zksync --script use-init.ts",
+    "swap": "yarn hardhat deploy-zksync --script use-swap.ts",
     "w3f:deploy": "npx w3f deploy web3-functions/trade/index.ts",
-    "w3f:test": "npx w3f test web3-functions/trade/index.ts --logs --chain-id=280"
+    "w3f:test": "npx w3f test web3-functions/trade/index.ts --logs --chain-id=324"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.8"
   }
 }
