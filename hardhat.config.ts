@@ -59,7 +59,7 @@ const config: HardhatUserConfig = {
     debug: false,
     networks: ["hardhat", "zkSync","polygon"], //(multiChainProvider) injects provider for these networks
   },
-  defaultNetwork: "hardhat",
+  defaultNetwork: "zkSync",
   networks: {
     hardhat: {
       zksync: true,
