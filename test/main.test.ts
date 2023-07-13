@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { Wallet, Provider, Contract } from "zksync-web3";
-import hre, { ethers, w3f } from "hardhat";
+import hre, { w3f } from "hardhat";
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 import { MockSwap } from "../typechain-types/MockSwap";
 import { parseEther } from "ethers/lib/utils";
