@@ -9,7 +9,7 @@ dotenv.config();
 // load contract artifact. Make sure to compile first!
 import * as ContractArtifact from "../artifacts-zk/contracts/MockSwap.sol/MockSwap.json";
 import { MockSwap } from "../typechain-types/MockSwap";
-import { parseEther } from "ethers/lib/utils";
+
 
 const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY || "";
 
@@ -37,17 +37,17 @@ export default async function (hre: HardhatRuntimeEnvironment) {
     signer
   ) as MockSwap; 
 
-  // Read message from contract
 
 
-  // send transaction to update the message
-  const newMessage =  1000000000
-  const tx = await contract.deposit("0xB65540bBA534E88EB4a5062D0E6519C07063b259",newMessage)
+  // send transaction to deposit and set operator
+  const deposit =  1000000000
+  const tx = await contract.deposit("0xB65540bBA534E88EB4a5062D0E6519C07063b259",deposit)
   await tx.wait();
-  
+  console.log(`Deposited ${deposit} into ${CONTRACT_ADDRESS} in ${tx.hash} `);
+
   const tx2 = await contract.setOperator("0x33cf616a7405b4464653f9d543052a1b416c35b1")
   await tx2.wait();
-  console.log(`Transaction to change the message is ${tx.hash}`);
+  console.log(`Transaction to set operator ${tx2.hash}`);
   
 
   // Read message after transaction
