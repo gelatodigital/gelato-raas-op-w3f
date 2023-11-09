@@ -1,0 +1,35 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/MockSwap.sol": {
+      "content": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.8.0;\n\nstruct Pair {\n    uint256 usdc;\n    uint256 weth;\n}\n\ncontract MockSwap {\n    uint256 constant FACTOR = 10000; \n\n    mapping(address => Pair) public balanceByUser;\n    mapping(address => address) public operatorByUser;\n\n    constructor() {}\n\n    function setOperator(address operator) external {\n        operatorByUser[msg.sender] = operator;\n    }\n\n    function deposit(address user, uint256 amount) external {\n        require(\n            msg.sender == user || msg.sender == operatorByUser[user],\n            \"MockSwap.swap not allowed\"\n        );\n\n        balanceByUser[user].usdc = balanceByUser[user].usdc + amount;\n    }\n\n    function swap(address user, uint256 price, bool buy) external {\n        require(\n            msg.sender == user || msg.sender == operatorByUser[user],\n            \"MockSwap.swap not allowed\"\n        );\n        Pair storage userPair = balanceByUser[user];\n        require(\n            (buy == true && userPair.weth == 0) ||\n                (buy == false && userPair.usdc == 0),\n            \"MockSwap.swap wrong config trade\"\n        );\n\n        if (buy) {\n            userPair.weth = (userPair.usdc * FACTOR) / price;\n            userPair.usdc = 0;\n        } else {\n            userPair.usdc = (userPair.weth * price/FACTOR) + userPair.usdc;\n            userPair.weth = 0;\n        }\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

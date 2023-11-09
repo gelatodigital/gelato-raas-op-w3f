@@ -1,16 +1,16 @@
 {
-  "name": "zksync-hardhat-template",
+  "name": "gelato-raas-w3f-starter",
   "version": "1.0.0",
   "main": "index.js",
   "author": "Antonio <aug@matterlabs.dev>",
   "license": "MIT",
   "devDependencies": {
+    "@ethersproject/providers": "5.7.2",
     "@gelatonetwork/automate-sdk": "^2.7.0-beta",
-    "@gelatonetwork/web3-functions-sdk": "^2.0.3",
-    "@matterlabs/hardhat-zksync-deploy": "^0.6.3",
-    "@matterlabs/hardhat-zksync-solc": "^0.4.0",
-    "@matterlabs/hardhat-zksync-verify": "^0.2.0",
+    "@gelatonetwork/web3-functions-sdk": "2.1.7",
     "@nomicfoundation/hardhat-verify": "^1.0.3",
+    "@nomicfoundation/hardhat-chai-matchers": "1.0.6",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
     "@nomiclabs/hardhat-ethers": "2.2.3",
     "@nomiclabs/hardhat-etherscan": "^3.1.7",
     "@paraswap/sdk": "^6.1.2",
@@ -24,19 +24,19 @@
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
     "hardhat": "^2.12.4",
+    "hardhat-deploy": "0.11.29",
     "mocha": "^10.2.0",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.1",
-    "typescript": "^4.9.4",
-    "zksync-web3": "^0.14.3"
+    "typescript": "^4.9.4"
   },
   "scripts": {
-    "test": "NODE_ENV=test hardhat test --network zkSync",
-    "deploy": "yarn hardhat deploy-zksync --script deploy-mock-swap.ts",
-    "initialize": "yarn hardhat deploy-zksync --script use-init.ts",
-    "swap": "yarn hardhat deploy-zksync --script use-swap.ts",
+    "test": "npx hardhat test",
+    "deploy": "npx hardhat deploy",
+    "deposit": "npx hardhat run scripts/init.ts",
+    "swap": "npx hardhat run scripts/swap.ts",
     "w3f:deploy": "npx w3f deploy web3-functions/trade/index.ts",
-    "w3f:test": "npx w3f test web3-functions/trade/index.ts --logs --chain-id=324"
+    "w3f:test": "npx w3f test web3-functions/trade/index.ts --logs --chain-id=42069"
   },
   "dependencies": {
     "@nomicfoundation/hardhat-network-helpers": "^1.0.8"

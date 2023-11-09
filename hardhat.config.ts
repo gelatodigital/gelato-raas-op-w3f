@@ -1,81 +1,84 @@
 import { HardhatUserConfig } from "hardhat/config";
 
-import "@matterlabs/hardhat-zksync-deploy";
-import "@matterlabs/hardhat-zksync-solc";
-
-import "@matterlabs/hardhat-zksync-verify";
-import "@nomicfoundation/hardhat-verify";
+// PLUGINS
 import "@gelatonetwork/web3-functions-sdk/hardhat-plugin";
+import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomiclabs/hardhat-ethers";
+import "@nomiclabs/hardhat-etherscan";
 import "@typechain/hardhat";
-import * as glob from 'glob';
-import { resolve } from 'path';
+import "hardhat-deploy";
 
+// Process Env Variables
+import * as dotenv from "dotenv";
+dotenv.config({ path: __dirname + "/.env" });
 
+const PK = process.env.PK;
+const ALCHEMY_ID = process.env.ALCHEMY_ID;
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
 
-const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || "";
-
-// dynamically changes endpoints for local tests
-const zkSyncTestnet =
-  process.env.NODE_ENV == "test"
-    ? {
-        url: "http://localhost:3050",
-        ethNetwork: "http://localhost:8545",
-        zksync: true,
-      }
-    : {
-        url: "https://zksync2-testnet.zksync.dev",
-        ethNetwork: "goerli",
-        zksync: true,
-        // contract verification endpoint
-        verifyURL:
-          "https://zksync2-testnet-explorer.zksync.dev/contract_verification",
-      };
-
-      const zkSync =
-      process.env.NODE_ENV == "test"
-        ? {
-            url: "http://localhost:3050",
-            ethNetwork: "http://localhost:8545",
-            zksync: true,
-          }
-        : {
-            url: "https://mainnet.era.zksync.io",
-            ethNetwork: "ethereum",
-            zksync: true,
-       
-            verifyURL: 'https://zksync2-mainnet-explorer.zksync.io/contract_verification'
-            // contract verification endpoint
-        
-          };
-
+// HardhatUserConfig bug
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const config: HardhatUserConfig = {
-  zksolc: {
-    version: "latest",
-    settings: {},
-  },
-  w3f: {
+  // web3 functions
+   w3f: {
     rootDir: "./web3-functions",
     debug: false,
-    networks: ["hardhat", "zkSync","polygon"], //(multiChainProvider) injects provider for these networks
+    networks: ["hardhat", "polygon"], //(multiChainProvider) injects provider for these networks
   },
-  defaultNetwork: "zkSync",
+  // hardhat-deploy
+  namedAccounts: {
+    deployer: {
+      default: 0,
+    },
+  },
+  defaultNetwork: "hardhat",
+
   networks: {
     hardhat: {
-      zksync: true,
+      forking: {
+        url: `https://rpc.op-testnet.gelato.digital`,
+        blockNumber: 92,
+      },
     },
-    zkSyncTestnet,
-    zkSync,
+
+    zKatana: {
+      accounts: PK ? [PK] : [],
+      chainId: 1261120,
+      url: `https://rpc.zkatana.gelato.digital`,
+    },
+    opTest: {
+      accounts: PK ? [PK] : [],
+      chainId: 42069,
+      url: `https://rpc.op-testnet.gelato.digital`,
+    },
     polygon: {
+      accounts: PK ? [PK] : [],
       chainId: 137,
-      url: "https://polygon-rpc.com",
+      url: `https://polygon-rpc.com`,
     },
   },
-  etherscan: { // Optional - If you plan on verifying a smart contract on Ethereum within the same project
-    apiKey:  ETHERSCAN_KEY //<Your API key for Etherscan>,
-  },
+
   solidity: {
-    version: "0.8.17",
+    compilers: [
+      {
+        version: "0.8.18",
+        settings: {
+          optimizer: { enabled: true, runs: 200 },
+        },
+      },
+    ],
+  },
+
+  typechain: {
+    outDir: "typechain",
+    target: "ethers-v5",
+  },
+
+  // hardhat-deploy
+  verify: {
+    etherscan: {
+      apiKey: ETHERSCAN_API_KEY ? ETHERSCAN_API_KEY : "",
+    },
   },
 };
 

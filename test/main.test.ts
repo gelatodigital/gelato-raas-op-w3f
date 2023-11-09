@@ -1,50 +1,53 @@
 import { expect } from "chai";
-import { Wallet, Provider, Contract } from "zksync-web3";
+
 import hre, { w3f } from "hardhat";
-import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
-import { MockSwap } from "../typechain-types/MockSwap";
-import { parseEther } from "ethers/lib/utils";
+const { ethers, deployments } = hre;
+
 import { Web3FunctionResultV2 } from "@gelatonetwork/web3-functions-sdk/*";
-import { impersonateAccount } from "@nomicfoundation/hardhat-network-helpers";
+import { MockSwap } from "../typechain/MockSwap";
 
-const RICH_WALLET_PK =
-  "0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110";
-
-async function deployMockSwap(deployer: Deployer): Promise<Contract> {
-  const artifact = await deployer.loadArtifact("MockSwap");
-  return await deployer.deploy(artifact, []);
-}
 
 describe("MockSwap", function () {
   it("Should run", async function () {
-    const provider = await Provider.getDefaultProvider();
+    if (hre.network.name !== "hardhat") {
+      console.error("Test Suite is meant to be run on hardhat only");
+      process.exit(1);
+    }
 
-    const wallet = new Wallet(RICH_WALLET_PK, provider);
-    const deployer = new Deployer(hre, wallet);
+    await deployments.fixture();
 
-    const mockSwap = (await deployMockSwap(deployer)) as MockSwap;
+    const[deployer] = await ethers.getSigners();
+    
 
-    let userPair = await mockSwap.balanceByUser(deployer.zkWallet.address);
+    const  mockSwap = (await ethers.getContractAt(
+      "MockSwap",
+      (
+        await deployments.get("MockSwap")
+      ).address
+    )) as MockSwap;
+
+    let userPair = await mockSwap.balanceByUser(deployer.address);
 
     const depositValue = 10000 * 10 ** 6;
     const depositTx = await mockSwap.deposit(
-      deployer.zkWallet.address,
+     await  deployer.address,
       depositValue
     );
     await depositTx.wait();
 
-    userPair = await mockSwap.balanceByUser(deployer.zkWallet.address);
+
+    userPair = await mockSwap.balanceByUser(deployer.address);
 
     const mockSwapW3f = w3f.get("trade");
 
     let userArgs = {
-      user: deployer.zkWallet.address,
+      user: deployer.address,
       contract: mockSwap.address,
     };
 
+   
 
-
-    let w3f1 = await mockSwapW3f.run({ userArgs });
+    let w3f1 = await mockSwapW3f.run({ userArgs});
     let result = w3f1.result as Web3FunctionResultV2;
 
     expect(result.canExec).to.equal(true);
@@ -52,16 +55,16 @@ describe("MockSwap", function () {
     if (result.canExec == true) {
       const data = result.callData[0];
 
-      let w3fTx = await deployer.zkWallet.sendTransaction({
+      let w3fTx = await deployer.sendTransaction({
         to: data.to,
         data: data.data,
       });
 
       await w3fTx.wait();
-      userPair = await mockSwap.balanceByUser(deployer.zkWallet.address);
+      userPair = await mockSwap.balanceByUser(deployer.address);
 
       const storage = {
-        lastMax: "5200.00",
+        lastMax: "3200.00",
         lastMin: "0",
       };
 
@@ -71,13 +74,13 @@ describe("MockSwap", function () {
       expect(result2.canExec).to.equal(true);
       if (result2.canExec == true) {
         const data2 = result2.callData[0];
-        let w3fTx2 = await deployer.zkWallet.sendTransaction({
+        let w3fTx2 = await deployer.sendTransaction({
           to: data2.to,
           data: data2.data,
         });
 
         await w3fTx2.wait();
-        userPair = await mockSwap.balanceByUser(deployer.zkWallet.address);
+        userPair = await mockSwap.balanceByUser(deployer.address);
       }
     }
   });

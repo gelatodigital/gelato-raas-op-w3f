@@ -1,5 +1,5 @@
-# zkSync <> Gelato Web3 Functions Workshop : Simple Trade Strategies
-
+# OpTest <> Gelato Web3 Functions: Simple Trade Strategies
+This project showcases how to use Gelato Web3 Functions to implement automatic trading strategies on OpTestnet
 
 ### Environment variables
 
@@ -8,14 +8,12 @@ In order to prevent users to leak private keys, this project includes the `doten
 To use it, rename `.env.example` to `.env` and enter your private key.
 
 ```
-WALLET_PRIVATE_KEY=123cde574ccff....
+PK=123cde574ccff....
 PROVIDE_URLS=http
 ```
 
 
 ### Summary
-
-This project showcases how to use Gelato Web3 Functions to implement automatic trading strategies in zkSync
 
  We implement two simple trading strategies:
 
@@ -30,10 +28,10 @@ b) "Bounce Entry."
 
 ## Demo
 
-We have created a MockSwap contract that do the "fake" swapping between usdc and weth, the contract is deployed on zkSync Mainnet at [https://explorer.zksync.io/address/0x5e78ba86fd2E56d94c13334cD17FBD9Bb16838e0#transactions](https://explorer.zksync.io/address/0x5e78ba86fd2E56d94c13334cD17FBD9Bb16838e0#transactions)
+We have created a MockSwap contract that do the "fake" swapping between usdc and weth, the contract is deployed on OtTest at [https://blockscout.op-testnet.gelato.digital/address/0x76243f8B81C6C88293B7d522920D408B4061F114/read-contract#address-tabs](https://blockscout.op-testnet.gelato.digital/address/0x76243f8B81C6C88293B7d522920D408B4061F114/read-contract#address-tabs)
 
 
-The task is live on zkSync [here](https://beta.app.gelato.network/task/0xa506fc8b0bd6dfae281637c37eed7956a083b0f3fcebf462297e051c8d87d4be?chainId=324)
+The task is live on OpTestnet [here](https://beta.app.gelato.network/functions/task/0xeea10c1fc28af78caa9c349d63db89dc7b2dacca0239f94dbd225963766a689f:42069)
 
 
 ### Steps to step the web3 function
@@ -49,7 +47,7 @@ And be will get:
  ✓ CID: QmTu44n9N4aMFRSh8255qnKtc1b4izphY1stBrA8Agn2g9
 
 To create a task that runs your Web3 Function every minute, visit:
-> https://beta.app.gelato.network/new-task?cid=QmTu44n9N4aMFRSh8255qnKtc1b4izphY1stBrA8Agn2g9
+> https://beta.app.gelato.network/new-task?cid=QmfDFVSqNGEtJz1QL71tDyFC3xzZhbd4mhLY8jDsgN3bko
 ```
 
 2) Create the Task:
@@ -59,7 +57,7 @@ Clicking on the above link, we will be forwarded to the creating task UI where w
 
 3) Fund the 1Balance
 
-We will need to fund 1Balance to pay for the transactions. For the time being, we fund 1balance depositing USDC on Polygon
+We will need to fund 1Balance to pay for the transactions. We can do tht deposit gETH on Goerli paying for all of W3F testnet transactions.
 
 <p align="left">
   <img src="https://github.com/gelatodigital/enzyme-poc/blob/master/images/balance.png?raw=true" width="350" title="hover text">
@@ -70,29 +68,27 @@ We will need to fund 1Balance to pay for the transactions. For the time being, w
 
 ### Unit testing
 
-In order to be able to run the unit testing please follow the steps in [https://era.zksync.io/docs/tools/hardhat/testing.html](https://era.zksync.io/docs/tools/hardhat/testing.html)
-
-and then simply:
 
 ```
 yarn test
 ```
 
 ```
-$ NODE_ENV=test hardhat test --network zkSync
+$ npx hardhat test
 
 
   MockSwap
-> Current Price: 1886.7936815401163
+> Current Price: 2028.4773868066882
 > No trade
 > Initiatig Price Entry
-> 18867937
-> Current Price: 1886.7936815401163
+> 20284774
+> Current Price: 2028.4773868066882
 > Active Trade
-> Trade Exit---> Price Decrease 63.72 greater than NaN %
-> 18867937
-    ✔ Should run (10675ms)
+> 108 0.36610081662290994
+> Trade Exit---> Price Decrease 36.61 greater than 2 %
+> 20284774
+    ✔ Should run (17716ms)
 
 
-  1 passing (11s)
+  1 passing (18s)
 ```

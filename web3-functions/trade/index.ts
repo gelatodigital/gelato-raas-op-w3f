@@ -4,15 +4,12 @@ import {
   Web3FunctionContext,
   Web3FunctionResult,
 } from "@gelatonetwork/web3-functions-sdk";
-import {
-  impersonateAccount,
-  setBalance,
-} from "@nomicfoundation/hardhat-network-helpers";
+
 import { Contract, ethers } from "ethers";
 import { uniswapQuote } from "./uniswap-quote";
 import { MockSwapAbi } from "./abi";
-import { MockSwap } from "../../typechain-types/MockSwap";
-import { parseEther } from "ethers/lib/utils";
+
+import { MockSwap } from "../../typechain/MockSwap";
 
 Web3Function.onRun(async (context: Web3FunctionContext) => {
   const { userArgs, storage, secrets, multiChainProvider } = context;
@@ -20,7 +17,7 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
 
   const provider = multiChainProvider.default();
 
-  const POLYGON_PROVIDER = multiChainProvider.chainId(137)
+  const POLYGON_PROVIDER  = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
 
   ///// User Args
   const user = userArgs.user as string;
@@ -32,8 +29,9 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
   const lastMax = +((await storage.get("lastMax")) ?? "0");
 
   //// Secrets
-  const ENTRY = +((await secrets.get("ENTRY")) as string);
-  const EXIT = +((await secrets.get("EXIT")) as string);
+  const ENTRY = +((await secrets.get("ENTRY") ?? "2") as string) ;
+  const EXIT = +((await secrets.get("EXIT")?? "2") as string);
+
 
  
 
@@ -49,7 +47,6 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
 
 
   let wethBalance = +userBalance.weth.toString();
-  let usdcbalance = +userBalance.usdc.toString();
 
 
   let price = await uniswapQuote(POLYGON_PROVIDER);
@@ -107,7 +104,7 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
       ///  Price Decrease Greater than threshold ---> EXIT THE TRADE
       ///  *****************************************************  ///
       await storage.set("lastMin", price.toString());
-  
+
       console.log(
         `Trade Exit---> Price Decrease ${((diff / lastMax) * 100).toFixed(
           2
@@ -122,6 +119,7 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
     /////  ==== We are NOT in a trade ===================== /////
     ///  *****************************************************  ///
     if (lastMin == 0) {
+
       await storage.set("lastMin", price.toString());
       console.log("Initiatig Price Entry")
 
